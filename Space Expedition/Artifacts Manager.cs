@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
@@ -68,6 +69,85 @@ namespace Space_Expedition {
                     Console.WriteLine("Invalid choice. Try again");
                 }
             }
+        }
+        public static void AddArtifact(ref Artifact[] artifacts, ref int count) {
+            Console.WriteLine("Enter the name of the file you want to add.");
+            Console.WriteLine("Enter name: ");
+            string fileName = Console.ReadLine();
+
+            string line = "";
+            try {
+                line = File.ReadAllText(fileName).Trim();
+            }
+            catch (Exception) {
+                Console.WriteLine("Artifact file not found or could not be read.");
+                return;
+            }
+
+            //Validate that it has exactly 5 parts
+            string[] parts = line.Split('|');
+            if(parts.Length != 5) {
+                Console.WriteLine("Invalid artifact file format.");
+                return;
+            }
+
+            // 4. Assign each part to the corresponding variable
+            string encodedName = parts[0].Trim();
+            string planet = parts[1].Trim();
+            string discoveryDate = parts[2].Trim();
+            string storageLocation = parts[3].Trim();
+            string description = parts[4].Trim();
+            string decodedName = "";
+
+
+            int index = BinarySearch(artifacts, count, decodedName);
+
+            int insertIndex = count;
+            for (int i = 0; i < count; i++) {
+                if (newArtifacts.Title.ToLower()!.CompareTo(artifacts[i].ToLower()!) < 0) {
+                    insertIndex = i;
+                    break;
+                }
+            }
+            // Shift elements right to make space
+            for (int j = count; j > insertIndex; j--) {
+                artifacts[j] = artifacts[j - 1];
+            }
+            // Insert the new artwork
+            artifacts[insertIndex] = newArtwork;
+            count++;
+
+
+            // Expand array if it is full
+            if (count >= artifacts.Length) {
+                Artifact[] newArray = new Artifact[artifacts.Length * 2];
+                for (int i = 0; i < artifacts.Length; i++) {
+                    newArray[i] = artifacts[i];
+                }
+                artifacts = newArray;
+            }
+
+        }
+
+        public static int BinarySearch(Artifact[] artifacts, int count, string decodedName) {
+            string key = decodedName.ToLower();
+            int lo = 0;
+            int hi = count - 1;
+
+            while (lo <= hi) {
+                int mid = (lo + hi) / 2;
+                string midArtifact = artifacts[mid].DecodedName.ToLower();
+                if (midArtifact == key) {
+                    return mid;
+                }
+                else if (String.Compare(midArtifact, key) > 0) {
+                    hi = mid - 1;
+                }
+                else {
+                    lo = mid + 1;
+                }
+            }
+            return -1;
         }
     }
 }
