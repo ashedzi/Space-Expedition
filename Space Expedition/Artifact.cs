@@ -22,5 +22,6 @@ namespace Space_Expedition {
             StorageLocation = storageLocation;
             Description = description;
         }
+           
     }
 }
