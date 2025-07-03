@@ -189,10 +189,17 @@ namespace Space_Expedition {
 
         }
 
-        public static string Decode(string encoded) {
-            string decoded;
-            decoded = encoded;
-            return decoded;
+        public static string Decode(string encodedName) {
+            string decodedName = "";
+
+            for(int i = 0; i < encodedName.Length - 1; i += 2) {
+                char letter = encodedName[i];
+                int level = encodedName[i + 1] - '0'; //convert char digit to int
+                char decodedChar = DecodeChar(letter, level);
+                decodedName += decodedChar;
+            }
+
+            return decodedName;
         }
 
     }
