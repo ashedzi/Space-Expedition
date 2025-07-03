@@ -156,5 +156,44 @@ namespace Space_Expedition {
             return -1;
         }
 
+        public static char DecodeChar(char letter, int level) {
+            char[] originalArray = {
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+            };
+
+            char[] mappedArray = { 'H', 'Z', 'A', 'U', 'Y', 'E', 'K', 'G', 'O', 'T', 'I', 'R', 'J', 'V', 'W', 'N', 'M', 'F', 'Q', 'S', 'D', 'B', 'X', 'L', 'C', 'P' };
+
+            //base case: mirror when level is 0
+            if(level == 0) {
+                int index = letter - 'A';
+                return (char)('Z' - index);
+            }
+
+            //Find index of letter in the original array
+            int letterIndex = -1;
+            for(int i =0; i < originalArray.Length; i++) {
+                if (originalArray[i] == letter) {
+                    letterIndex = i;
+                    break;
+                }
+            }
+
+            if(letterIndex == -1) {
+                Console.WriteLine($"Invalid letter: {letter}");
+                return '?';
+            }
+
+            //Map it once, then recurse
+            char mappedLetter = mappedArray[letterIndex];
+            return DecodeChar(mappedLetter, level - 1);
+
+        }
+
+        public static string Decode(string encoded) {
+            string decoded;
+            decoded = encoded;
+            return decoded;
+        }
+
     }
 }
