@@ -192,7 +192,7 @@ namespace Space_Expedition {
                 return '?';
             }
             char nextLetter = mappedArray[letterIndex];
-            Console.WriteLine($"  Level {level}->{level - 1}: {letter} maps to {nextLetter}");
+            //Console.WriteLine($"  Level {level}->{level - 1}: {letter} maps to {nextLetter}");
             return DecodeChar(nextLetter, level - 1);
         }
 
