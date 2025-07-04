@@ -63,6 +63,7 @@ namespace Space_Expedition {
                     AddArtifact(ref artifacts, ref count);
                 }
                 else if (userChoice == "3") {
+                    SaveToFile(artifacts, count);
                     Console.WriteLine("Goodbye explorer!");
                     isRunning = false;
                 }
@@ -150,6 +151,17 @@ namespace Space_Expedition {
                 }
                 artifacts[j + 1] = tempValue;
             }
+        }
+
+
+        public static void SaveToFile(Artifact[] artifacts, int count) {
+            using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
+                for (int i = 0; i < count; i++) {
+                    Artifact artifact = artifacts[i];
+                    writer.WriteLine($"{artifact.EncodedName}|{artifact.Planet}|{artifact.DiscoveryDate}|{artifact.StorageLocation}|{artifact.Description}");
+                }
+            }
+            Console.WriteLine("Inventory saved to expedition_summary.txt");
         }
 
     }
