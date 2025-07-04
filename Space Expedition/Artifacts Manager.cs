@@ -16,7 +16,8 @@ namespace Space_Expedition {
             count = 0;
 
             for (int i = 0; i < artifactLines.Length; i++) {
-                string[] artifactParts = artifactLines[i].Split('|');
+                string[] artifactParts = artifactLines[i].Split(',');
+
                 if (artifactParts.Length == 5) {
                     string encodedName = artifactParts[0].Trim();
                     string planet = artifactParts[1].Trim();
@@ -41,8 +42,8 @@ namespace Space_Expedition {
         public static void StartApp(Artifact[] artifacts, ref int count) {
             bool isRunning = true;
             while (isRunning) {
-                Console.WriteLine("Hey there! What will you like to do today?");
-                Console.WriteLine("Select an option fro 1-4");
+                Console.WriteLine("\nHey there! What will you like to do today?");
+                Console.WriteLine("Select an option fro 1-3");
                 Console.WriteLine("1. View inventory");
                 Console.WriteLine("2. Add artifact");
                 Console.WriteLine("3. Save & Exit");
@@ -75,7 +76,14 @@ namespace Space_Expedition {
 
         public static void AddArtifact(ref Artifact[]artifacts, ref int count) {
             Console.WriteLine("Enter the name of the file you want to add (e.g nebula_noodle_net.txt): ");
-            string fileName = Console.ReadLine();
+
+            string fileName = Console.ReadLine().Trim();
+
+            // Check if file exists
+            if (!File.Exists(fileName)) {
+                Console.WriteLine("File not found. Please check the name and try again.");
+                return;
+            }
 
             string line = "";
             try {
@@ -188,12 +196,19 @@ namespace Space_Expedition {
         }
 
         public static string Decode(string encodedName) {
+            string cleanEncode = encodedName.Replace("|", "").Replace(" ", "");
             string decodedName = "";
 
-            for(int i = 0; i < encodedName.Length - 1; i += 2) {
-                char letter = encodedName[i];
-                int level = encodedName[i + 1] - '0'; //convert char digit to int
-                char decodedChar = DecodeChar(letter, level);
+            for(int i = 0; i < cleanEncode.Length - 1; i += 2) {
+                char letter = cleanEncode[i];
+
+                int level; //convert char digit to int
+                if (!int.TryParse(cleanEncode[i + 1].ToString(), out level)) {
+                    Console.WriteLine($"Invalid level: {cleanEncode[i + 1]}");
+                    continue;
+                }
+
+                char decodedChar = DecodeChar(char.ToUpper(letter), level);
                 decodedName += decodedChar;
             }
 
