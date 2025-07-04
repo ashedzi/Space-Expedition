@@ -24,7 +24,6 @@ namespace Space_Expedition {
                     string discoveryDate = artifactParts[2].Trim();
                     string storageLocation = artifactParts[3].Trim();
                     string description = artifactParts[4].Trim();
-                    Console.WriteLine($"Encoded input from file: '{encodedName}'");
                     string decodedName = Decode(encodedName);
                     artifacts[count++] = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
                 }
@@ -79,7 +78,7 @@ namespace Space_Expedition {
             }
         }
         public static Artifact[] AddArtifact(Artifact[]artifacts, ref int count) {
-            Console.WriteLine("Enter the name of the file you want to add (e.g nebula_noodle_net.txt): ");
+            Console.WriteLine("Enter the name of the file you want to add. Name should match the exact way it appears in your files (e.g Nebula Noodle Net.txt): ");
 
             string fileName = Console.ReadLine().Trim();
 
@@ -144,7 +143,7 @@ namespace Space_Expedition {
 
             artifacts[insertIndex] = newArtifact;
             count++;
-            Console.WriteLine($"Artifact '{decodedName}' added successfully at position {insertIndex + 1}.");
+            Console.WriteLine($"Artifact '{decodedName}' added successfully.");
             //Console.WriteLine("Artifact added successfully.");
             return artifacts;
         }
