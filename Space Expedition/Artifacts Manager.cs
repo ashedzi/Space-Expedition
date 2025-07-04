@@ -16,7 +16,7 @@ namespace Space_Expedition {
             count = 0;
 
             for (int i = 0; i < artifactLines.Length; i++) {
-                string[] artifactParts = artifactLines[i].Split(',');
+                string[] artifactParts = artifactLines[i].Split(',', 5);
 
                 if (artifactParts.Length == 5) {
                     string encodedName = artifactParts[0].Trim();
@@ -24,6 +24,7 @@ namespace Space_Expedition {
                     string discoveryDate = artifactParts[2].Trim();
                     string storageLocation = artifactParts[3].Trim();
                     string description = artifactParts[4].Trim();
+                    Console.WriteLine($"Encoded input from file: '{encodedName}'");
                     string decodedName = Decode(encodedName);
                     artifacts[count++] = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
                 }
@@ -34,7 +35,7 @@ namespace Space_Expedition {
             InsertionSort(artifacts, count);
             Console.WriteLine("\n----Loaded Artifacts------");
             for (int i = 0; i < count; i++) {
-                Console.WriteLine($"{artifacts[i].EncodedName} | {artifacts[i].DiscoveryDate}");
+                Console.WriteLine($"{artifacts[i].DecodedName} | {artifacts[i].DiscoveryDate}");
             }
             return artifacts;
         }
@@ -43,7 +44,7 @@ namespace Space_Expedition {
             bool isRunning = true;
             while (isRunning) {
                 Console.WriteLine("\nHey there! What will you like to do today?");
-                Console.WriteLine("Select an option fro 1-3");
+                Console.WriteLine("Select an option from 1-3");
                 Console.WriteLine("1. View inventory");
                 Console.WriteLine("2. Add artifact");
                 Console.WriteLine("3. Save & Exit");
@@ -56,12 +57,13 @@ namespace Space_Expedition {
                     }
                     else {
                         for (int i = 0; i < count; i++) {
-                            Console.WriteLine($"{artifacts[i].EncodedName} | {artifacts[i].Planet}");
+                            Console.WriteLine($"{artifacts[i].DecodedName} | {artifacts[i].Planet} | {artifacts[i].DiscoveryDate}");
                         }
                     }
                 }
                 else if (userChoice == "2") {
-                    AddArtifact(ref artifacts, ref count);
+                    //AddArtifact(ref artifacts, ref count);
+                   artifacts = AddArtifact(artifacts, ref count);
                 }
                 else if (userChoice == "3") {
                     SaveToFile(artifacts, count);
@@ -74,7 +76,7 @@ namespace Space_Expedition {
             }
         }
 
-        public static void AddArtifact(ref Artifact[]artifacts, ref int count) {
+        public static Artifact[] AddArtifact(Artifact[]artifacts, ref int count) {
             Console.WriteLine("Enter the name of the file you want to add (e.g nebula_noodle_net.txt): ");
 
             string fileName = Console.ReadLine().Trim();
@@ -82,7 +84,7 @@ namespace Space_Expedition {
             // Check if file exists
             if (!File.Exists(fileName)) {
                 Console.WriteLine("File not found. Please check the name and try again.");
-                return;
+                return artifacts;
             }
 
             string line = "";
@@ -91,13 +93,13 @@ namespace Space_Expedition {
             }
             catch(Exception) {
                 Console.WriteLine("Artifact file not found or could not be read.");
-                return;
+                return artifacts;
             }
 
-            string[] parts = line.Split('|');
+            string[] parts = line.Split(',', 5);
             if(parts.Length != 5) {
                 Console.WriteLine("Invalid artifact file format.");
-                return;
+                return artifacts;
             }
 
             string encodedName = parts[0].Trim();
@@ -105,12 +107,14 @@ namespace Space_Expedition {
             string discoveryDate = parts[2].Trim();
             string storageLocation = parts[3].Trim();
             string description = parts[4].Trim();
+            Console.WriteLine($"Encoded input from added file: '{encodedName}'");
             string decodedName = Decode(encodedName);
+            Console.WriteLine($"Decoded name: '{decodedName}'");
 
             int index = BinarySearch(artifacts, count, decodedName);
             if(index != -1) {
                 Console.WriteLine("Artifact already exists in inventory.");
-                return;
+                return artifacts;
             }
 
             // Resize array if full
@@ -138,7 +142,9 @@ namespace Space_Expedition {
 
             artifacts[insertIndex] = newArtifact;
             count++;
-            Console.WriteLine("Artifact added successfully.");
+            Console.WriteLine($"Artifact '{decodedName}' added successfully at position {insertIndex + 1}.");
+            //Console.WriteLine("Artifact added successfully.");
+            return artifacts;
         }
 
         public static int BinarySearch(Artifact[] artifacts, int count, string decodedName) {
@@ -169,50 +175,59 @@ namespace Space_Expedition {
 
             char[] mappedArray = { 'H', 'Z', 'A', 'U', 'Y', 'E', 'K', 'G', 'O', 'T', 'I', 'R', 'J', 'V', 'W', 'N', 'M', 'F', 'Q', 'S', 'D', 'B', 'X', 'L', 'C', 'P' };
 
-            //base case: mirror when level is 0
-            if(level == 0) {
-                int index = letter - 'A';
-                return (char)('Z' - index);
-            }
+            letter = char.ToUpper(letter);
+            Console.WriteLine($"Decoding: {letter}{level}");
 
-            //Find index of letter in the original array
-            int letterIndex = -1;
-            for(int i =0; i < originalArray.Length; i++) {
-                if (originalArray[i] == letter) {
-                    letterIndex = i;
-                    break;
+            if (level == 1) {
+                if(letter < 'A' || letter > 'Z') {
+                    Console.WriteLine($"Invalid letter for mirroring: {letter}");
+                    return '?';
                 }
+                return (char)('Z' - (letter - 'A'));
             }
-
-            if(letterIndex == -1) {
+            // Recursive case: find letter in original array and map it
+            int letterIndex = Array.IndexOf(originalArray, letter);
+            if (letterIndex == -1) {
                 Console.WriteLine($"Invalid letter: {letter}");
                 return '?';
             }
-
-            //Map it once, then recurse
-            char mappedLetter = mappedArray[letterIndex];
-            return DecodeChar(mappedLetter, level - 1);
-
+            char nextLetter = mappedArray[letterIndex];
+            Console.WriteLine($"  Level {level}->{level - 1}: {letter} maps to {nextLetter}");
+            return DecodeChar(nextLetter, level - 1);
         }
 
         public static string Decode(string encodedName) {
-            string cleanEncode = encodedName.Replace("|", "").Replace(" ", "");
             string decodedName = "";
 
-            for(int i = 0; i < cleanEncode.Length - 1; i += 2) {
-                char letter = cleanEncode[i];
+            // Step 1: Split by space to get words
+            string[] words = encodedName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                int level; //convert char digit to int
-                if (!int.TryParse(cleanEncode[i + 1].ToString(), out level)) {
-                    Console.WriteLine($"Invalid level: {cleanEncode[i + 1]}");
-                    continue;
+            foreach (string word in words) {
+                string decodedWord = "";
+                string[] encodedChars = word.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach(string encodedChar in encodedChars) {
+                    if(encodedChar.Length < 2) {
+                        Console.WriteLine($"Invalid encoded character: {encodedChar}");
+                        continue;
+                    }
+
+                    char letter = encodedChar[0];
+                    string levelStr = encodedChar.Substring(1);
+
+                    if(!char.IsLetter(letter) || !int.TryParse(levelStr, out int level)) {
+                        Console.WriteLine($"Invalid encoded character format: {encodedChar}");
+                        continue;
+                    }
+                    char decodedChar = DecodeChar(letter, level);
+                    decodedWord += decodedChar;
                 }
 
-                char decodedChar = DecodeChar(char.ToUpper(letter), level);
-                decodedName += decodedChar;
+               if(!string.IsNullOrEmpty(decodedWord)) {
+                    decodedName += decodedWord + " ";
+                }
             }
-
-            return decodedName;
+            return decodedName.Trim();
         }
 
         public static void InsertionSort(Artifact[] artifacts, int count) {
@@ -228,7 +243,6 @@ namespace Space_Expedition {
             }
         }
 
-
         public static void SaveToFile(Artifact[] artifacts, int count) {
             using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
                 for (int i = 0; i < count; i++) {
@@ -238,6 +252,5 @@ namespace Space_Expedition {
             }
             Console.WriteLine("Inventory saved to expedition_summary.txt");
         }
-
     }
 }
