@@ -23,7 +23,7 @@ namespace Space_Expedition {
                     string discoveryDate = artifactParts[2].Trim();
                     string storageLocation = artifactParts[3].Trim();
                     string description = artifactParts[4].Trim();
-                    string decodedName = "";
+                    string decodedName = Decode(encodedName);
                     artifacts[count++] = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
                 }
                 else {
@@ -137,7 +137,6 @@ namespace Space_Expedition {
 
             return decodedName;
         }
-
 
         public static void InsertionSort(Artifact[] artifacts, int count) {
             for (int i = 1; i < count; i++) {
