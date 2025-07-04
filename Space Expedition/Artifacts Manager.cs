@@ -33,10 +33,6 @@ namespace Space_Expedition {
                 }
             }
             InsertionSort(artifacts, count);
-            Console.WriteLine("\n----Loaded Artifacts------");
-            for (int i = 0; i < count; i++) {
-                Console.WriteLine($"{artifacts[i].DecodedName} | {artifacts[i].DiscoveryDate}");
-            }
             return artifacts;
         }
 
@@ -50,32 +46,38 @@ namespace Space_Expedition {
                 Console.WriteLine("3. Save & Exit");
                 string userChoice = Console.ReadLine();
 
-                if (userChoice == "1") {
-                    Console.WriteLine("--------Your current Artifacts-----");
-                    if (count == 0) {
-                        Console.WriteLine("There are no artifacts available");
-                    }
-                    else {
-                        for (int i = 0; i < count; i++) {
-                            Console.WriteLine($"{artifacts[i].DecodedName} | {artifacts[i].Planet} | {artifacts[i].DiscoveryDate}");
-                        }
-                    }
-                }
-                else if (userChoice == "2") {
-                    //AddArtifact(ref artifacts, ref count);
-                   artifacts = AddArtifact(artifacts, ref count);
-                }
-                else if (userChoice == "3") {
-                    SaveToFile(artifacts, count);
-                    Console.WriteLine("Goodbye explorer!");
-                    isRunning = false;
-                }
-                else {
-                    Console.WriteLine("Invalid choice. Try again");
+                switch (userChoice) {
+                    case "1":
+                        ViewInventory(artifacts, count);
+                        break;
+                    case "2":
+                        artifacts = AddArtifact(artifacts, ref count);
+                        break;
+                    case "3":
+                        SaveToFile(artifacts, count);
+                        Console.WriteLine("Goodbye, space explorer!");
+                        isRunning = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please enter 1, 2, or 3.");
+                        break;
                 }
             }
         }
 
+        public static void ViewInventory(Artifact[] artifacts, int count) {
+            Console.WriteLine("\n--- CURRENT INVENTORY ----");
+            if (count == 0) {
+                Console.WriteLine("No artifacts in inventory.");
+            }
+            else {
+                Console.WriteLine($"Total artifacts: {count}");
+                for (int i = 0; i < count; i++) {
+                    Console.WriteLine($"{artifacts[i].DecodedName} | {artifacts[i].DiscoveryDate} | {artifacts[i].Planet} | {artifacts[i].StorageLocation} | {artifacts[i].Description}");
+                    Console.WriteLine();
+                }
+            }
+        }
         public static Artifact[] AddArtifact(Artifact[]artifacts, ref int count) {
             Console.WriteLine("Enter the name of the file you want to add (e.g nebula_noodle_net.txt): ");
 
@@ -176,7 +178,7 @@ namespace Space_Expedition {
             char[] mappedArray = { 'H', 'Z', 'A', 'U', 'Y', 'E', 'K', 'G', 'O', 'T', 'I', 'R', 'J', 'V', 'W', 'N', 'M', 'F', 'Q', 'S', 'D', 'B', 'X', 'L', 'C', 'P' };
 
             letter = char.ToUpper(letter);
-            Console.WriteLine($"Decoding: {letter}{level}");
+            //Console.WriteLine($"Decoding: {letter}{level}");
 
             if (level == 1) {
                 if(letter < 'A' || letter > 'Z') {
