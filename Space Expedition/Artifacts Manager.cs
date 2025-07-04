@@ -73,6 +73,66 @@ namespace Space_Expedition {
             }
         }
 
+        public static void AddArtifact(ref Artifact[]artifacts, ref int count) {
+            Console.WriteLine("Enter the name of the file you want to add (e.g nebula_noodle_net.txt): ");
+            string fileName = Console.ReadLine();
+
+            string line = "";
+            try {
+                line = File.ReadAllText(fileName).Trim();
+            }
+            catch(Exception) {
+                Console.WriteLine("Artifact file not found or could not be read.");
+                return;
+            }
+
+            string[] parts = line.Split('|');
+            if(parts.Length != 5) {
+                Console.WriteLine("Invalid artifact file format.");
+                return;
+            }
+
+            string encodedName = parts[0].Trim();
+            string planet = parts[1].Trim();
+            string discoveryDate = parts[2].Trim();
+            string storageLocation = parts[3].Trim();
+            string description = parts[4].Trim();
+            string decodedName = Decode(encodedName);
+
+            int index = BinarySearch(artifacts, count, decodedName);
+            if(index != -1) {
+                Console.WriteLine("Artifact already exists in inventory.");
+                return;
+            }
+
+            // Resize array if full
+            if (count >= artifacts.Length) {
+                Artifact[] newArray = new Artifact[artifacts.Length * 2];
+                for (int i = 0; i < artifacts.Length; i++) {
+                    newArray[i] = artifacts[i];
+                }
+                artifacts = newArray;
+            }
+
+            Artifact newArtifact = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
+
+            int insertIndex = count;
+            for(int i = 0; i < count; i++) {
+                if (newArtifact.DecodedName.ToLower().CompareTo(artifacts[i].DecodedName.ToLower())< 0) {
+                    insertIndex = i;
+                    break;
+                }
+            }
+
+            for(int j = count; j > insertIndex; j--) {
+                artifacts[j] = artifacts[j - 1];
+            }
+
+            artifacts[insertIndex] = newArtifact;
+            count++;
+            Console.WriteLine("Artifact added successfully.");
+        }
+
         public static int BinarySearch(Artifact[] artifacts, int count, string decodedName) {
             string key = decodedName.ToLower();
             int lo = 0;
