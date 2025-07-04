@@ -245,13 +245,17 @@ namespace Space_Expedition {
         }
 
         public static void SaveToFile(Artifact[] artifacts, int count) {
-            using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
-                for (int i = 0; i < count; i++) {
-                    Artifact artifact = artifacts[i];
-                    writer.WriteLine($"{artifact.EncodedName}|{artifact.Planet}|{artifact.DiscoveryDate}|{artifact.StorageLocation}|{artifact.Description}");
+            try {
+                using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
+                    for (int i = 0; i < count; i++) {
+                        Artifact artifact = artifacts[i];
+                        writer.WriteLine($"{artifact.EncodedName}|{artifact.Planet}|{artifact.DiscoveryDate}|{artifact.StorageLocation}|{artifact.Description}");
+                    }
                 }
+              Console.WriteLine("Inventory saved to expedition_summary.txt");
+            } catch (Exception ex) {
+                Console.WriteLine($"Error saving file: {ex.Message}");
             }
-            Console.WriteLine("Inventory saved to expedition_summary.txt");
         }
     }
 }
