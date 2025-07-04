@@ -30,6 +30,7 @@ namespace Space_Expedition {
                     Console.WriteLine($"Line {i + 1} has an invalid format");
                 }
             }
+            InsertionSort(artifacts, count);
             Console.WriteLine("\n----Loaded Artifacts------");
             for (int i = 0; i < count; i++) {
                 Console.WriteLine($"{artifacts[i].EncodedName} | {artifacts[i].DiscoveryDate}");
