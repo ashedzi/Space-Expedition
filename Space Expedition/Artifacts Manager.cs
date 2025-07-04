@@ -70,70 +70,6 @@ namespace Space_Expedition {
                 }
             }
         }
-        public static void AddArtifact(ref Artifact[] artifacts, ref int count) {
-            Console.WriteLine("Enter the name of the file you want to add (e.g nebula_noodle_net.txt):");
-            Console.WriteLine("Enter name: ");
-            string fileName = Console.ReadLine();
-
-            string line = "";
-            try {
-                line = File.ReadAllText(fileName).Trim();
-            }
-            catch (Exception) {
-                Console.WriteLine("Artifact file not found or could not be read.");
-                return;
-            }
-
-            //Validate that it has exactly 5 parts 
-            string[] parts = line.Split('|');
-            if(parts.Length != 5) {
-                Console.WriteLine("Invalid artifact file format.");
-                return;
-            }
-
-            // 4. Assign each part to the corresponding variable
-            string encodedName = parts[0].Trim();
-            string planet = parts[1].Trim();
-            string discoveryDate = parts[2].Trim();
-            string storageLocation = parts[3].Trim();
-            string description = parts[4].Trim();
-            string decodedName = Decode(encodedName);
-
-
-            int index = BinarySearch(artifacts, count, decodedName);
-            if(index != -1) {
-                Console.WriteLine("Artifact already exists in inventory");
-                return;
-            }
-
-            // Expand array if it is full
-            if (count >= artifacts.Length) {
-                Artifact[] newArray = new Artifact[artifacts.Length * 2];
-                for (int i = 0; i < artifacts.Length; i++) {
-                    newArray[i] = artifacts[i];
-                }
-                artifacts = newArray;
-            }
-
-            Artifact newArtifact = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
-            //Find the position to insert in(sorted by decodedName)
-            int insertIndex = count;
-            for (int i = 0; i < count; i++) {
-                if (newArtifact.DecodedName.ToLower().CompareTo(artifacts[i].DecodedName.ToLower()) < 0) {
-                    insertIndex = i;
-                    break;
-                }
-            }
-            // Shift elements right to make space
-            for (int j = count; j > insertIndex; j--) {
-                artifacts[j] = artifacts[j - 1];
-            }
-            // Insert the new artwork
-            artifacts[insertIndex] = newArtifact;
-            count++;
-
-            Console.WriteLine("Artifact added successfully.");
-        }
 
         public static int BinarySearch(Artifact[] artifacts, int count, string decodedName) {
             string key = decodedName.ToLower();
@@ -200,6 +136,20 @@ namespace Space_Expedition {
             }
 
             return decodedName;
+        }
+
+
+        public static void InsertionSort(Artifact[] artifacts, int count) {
+            for (int i = 1; i < count; i++) {
+                Artifact tempValue = artifacts[i];
+                int j = i - 1;
+
+                while (j >= 0 && String.Compare(artifacts[j].DecodedName.ToLower(), tempValue.DecodedName.ToLower()) > 0) {
+                    artifacts[j + 1] = artifacts[j];
+                    j--;
+                }
+                artifacts[j + 1] = tempValue;
+            }
         }
 
     }
