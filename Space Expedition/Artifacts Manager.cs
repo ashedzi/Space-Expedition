@@ -51,7 +51,7 @@ namespace Space_Expedition {
             bool isRunning = true;
             while (isRunning) {
                 Console.WriteLine("\nHey there! What will you like to do today?");
-                Console.WriteLine("Select an option from 1-3");
+                Console.WriteLine("Select an option from 1-3: ");
                 Console.WriteLine("1. View inventory");
                 Console.WriteLine("2. Add artifact");
                 Console.WriteLine("3. Save & Exit");
