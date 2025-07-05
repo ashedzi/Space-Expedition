@@ -253,7 +253,7 @@ namespace Space_Expedition {
                 using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
                     for (int i = 0; i < count; i++) {
                         Artifact artifact = artifacts[i];
-                        writer.WriteLine($"{artifact.EncodedName}|{artifact.Planet}|{artifact.DiscoveryDate}|{artifact.StorageLocation}|{artifact.Description}");
+                        writer.WriteLine($"{artifact.DecodedName}|{artifact.Planet}|{artifact.DiscoveryDate}|{artifact.StorageLocation}|{artifact.Description}");
                     }
                 }
               Console.WriteLine("Inventory saved to expedition_summary.txt");
