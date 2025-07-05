@@ -191,7 +191,6 @@ namespace Space_Expedition {
             };
 
             letter = char.ToUpper(letter);
-            if (level == 0) level = 1;
             if (level == 1) {
                 if(letter < 'A' || letter > 'Z') {
                     Console.WriteLine($"Invalid letter for mirroring: {letter}");
