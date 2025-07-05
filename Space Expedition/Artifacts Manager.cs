@@ -10,29 +10,41 @@ using System.Threading.Tasks;
 namespace Space_Expedition {
     internal class Artifacts_Manager {
         public static Artifact[] ReadFile(out int count) {
-            // Read all lines from the text file into an array
-            string[] artifactLines = File.ReadAllLines("galactic_vault.txt");
-            Artifact[] artifacts = new Artifact[artifactLines.Length];
             count = 0;
+            try {
+                string[] artifactLines = File.ReadAllLines("galactic_vault.txt");
+                Artifact[] artifacts = new Artifact[artifactLines.Length];
 
-            for (int i = 0; i < artifactLines.Length; i++) {
-                string[] artifactParts = artifactLines[i].Split(',', 5);
-
-                if (artifactParts.Length == 5) {
-                    string encodedName = artifactParts[0].Trim();
-                    string planet = artifactParts[1].Trim();
-                    string discoveryDate = artifactParts[2].Trim();
-                    string storageLocation = artifactParts[3].Trim();
-                    string description = artifactParts[4].Trim();
-                    string decodedName = Decode(encodedName);
-                    artifacts[count++] = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
+                for (int i = 0; i < artifactLines.Length; i++) {
+                    try {
+                        string[] artifactParts = artifactLines[i].Split(',', 5);
+                        if (artifactParts.Length == 5) {
+                            string encodedName = artifactParts[0].Trim();
+                            string planet = artifactParts[1].Trim();
+                            string discoveryDate = artifactParts[2].Trim();
+                            string storageLocation = artifactParts[3].Trim();
+                            string description = artifactParts[4].Trim();
+                            string decodedName = Decode(encodedName);
+                            artifacts[count++] = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
+                        }
+                        else {
+                            Console.WriteLine($"Line {i + 1} has an invalid format");
+                        }
+                    }
+                    catch(Exception ex) {
+                        Console.WriteLine($"Error processing line {i + 1}: {ex.Message}");
+                    }
                 }
-                else {
-                    Console.WriteLine($"Line {i + 1} has an invalid format");
-                }
+                InsertionSort(artifacts, count);
+                return artifacts;
+            } catch (FileNotFoundException) {
+                Console.WriteLine("galactic_vault.txt file not found.");
+                return new Artifact[0];
             }
-            InsertionSort(artifacts, count);
-            return artifacts;
+            catch (Exception ex) {
+                Console.WriteLine($"Error reading galactic_vault.txt: {ex.Message}");
+                return new Artifact[0];
+            }
         }
 
         public static void StartApp(Artifact[] artifacts, ref int count) {
@@ -79,24 +91,25 @@ namespace Space_Expedition {
         }
         public static Artifact[] AddArtifact(Artifact[]artifacts, ref int count) {
             Console.WriteLine("Enter the name of the file you want to add. Name should match the exact way it appears in your files (e.g Nebula Noodle Net.txt): ");
-
             string fileName = Console.ReadLine().Trim();
 
-            // Check if file exists
             if (!File.Exists(fileName)) {
                 Console.WriteLine("File not found. Please check the name and try again.");
                 return artifacts;
             }
-
             string line = "";
             try {
                 line = File.ReadAllText(fileName).Trim();
+                if (string.IsNullOrWhiteSpace(line)) {
+                    Console.WriteLine("File is empty. Operation cancelled.");
+                    return artifacts;
+                }
+                Console.WriteLine($"File content: '{line}'");
             }
-            catch(Exception) {
-                Console.WriteLine("Artifact file not found or could not be read.");
+            catch(Exception ex) {
+                Console.WriteLine($"Error reading file: {ex.Message}");
                 return artifacts;
             }
-
             string[] parts = line.Split(',', 5);
             if(parts.Length != 5) {
                 Console.WriteLine("Invalid artifact file format.");
@@ -108,9 +121,9 @@ namespace Space_Expedition {
             string discoveryDate = parts[2].Trim();
             string storageLocation = parts[3].Trim();
             string description = parts[4].Trim();
-            Console.WriteLine($"Encoded input from added file: '{encodedName}'");
+            Console.WriteLine($"\nEncoded input from added file: '{encodedName}'");
             string decodedName = Decode(encodedName);
-            Console.WriteLine($"Decoded name: '{decodedName}'");
+            Console.WriteLine($"\nDecoded name: '{decodedName}'");
 
             int index = BinarySearch(artifacts, count, decodedName);
             if(index != -1) {
@@ -118,7 +131,6 @@ namespace Space_Expedition {
                 return artifacts;
             }
 
-            // Resize array if full
             if (count >= artifacts.Length) {
                 Artifact[] newArray = new Artifact[artifacts.Length * 2];
                 for (int i = 0; i < artifacts.Length; i++) {
@@ -126,9 +138,7 @@ namespace Space_Expedition {
                 }
                 artifacts = newArray;
             }
-
             Artifact newArtifact = new Artifact(encodedName, decodedName, planet, discoveryDate, storageLocation, description);
-
             int insertIndex = count;
             for(int i = 0; i < count; i++) {
                 if (newArtifact.DecodedName.ToLower().CompareTo(artifacts[i].DecodedName.ToLower())< 0) {
@@ -144,7 +154,6 @@ namespace Space_Expedition {
             artifacts[insertIndex] = newArtifact;
             count++;
             Console.WriteLine($"Artifact '{decodedName}' added successfully.");
-            //Console.WriteLine("Artifact added successfully.");
             return artifacts;
         }
 
@@ -170,15 +179,19 @@ namespace Space_Expedition {
         }
 
         public static char DecodeChar(char letter, int level) {
-            char[] originalArray = {
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+            char[] originalArray = 
+                {
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+            };
+            char[] mappedArray = 
+                { 
+                'H', 'Z', 'A', 'U', 'Y', 'E', 'K', 'G', 'O', 'T', 'I', 'R', 'J',
+                'V', 'W', 'N', 'M', 'F', 'Q', 'S', 'D', 'B', 'X', 'L', 'C', 'P' 
             };
 
-            char[] mappedArray = { 'H', 'Z', 'A', 'U', 'Y', 'E', 'K', 'G', 'O', 'T', 'I', 'R', 'J', 'V', 'W', 'N', 'M', 'F', 'Q', 'S', 'D', 'B', 'X', 'L', 'C', 'P' };
-
             letter = char.ToUpper(letter);
-            //Console.WriteLine($"Decoding: {letter}{level}");
-
+            if (level == 0) level = 1;
             if (level == 1) {
                 if(letter < 'A' || letter > 'Z') {
                     Console.WriteLine($"Invalid letter for mirroring: {letter}");
@@ -186,36 +199,28 @@ namespace Space_Expedition {
                 }
                 return (char)('Z' - (letter - 'A'));
             }
-            // Recursive case: find letter in original array and map it
             int letterIndex = Array.IndexOf(originalArray, letter);
             if (letterIndex == -1) {
                 Console.WriteLine($"Invalid letter: {letter}");
                 return '?';
             }
             char nextLetter = mappedArray[letterIndex];
-            //Console.WriteLine($"  Level {level}->{level - 1}: {letter} maps to {nextLetter}");
             return DecodeChar(nextLetter, level - 1);
         }
 
         public static string Decode(string encodedName) {
             string decodedName = "";
-
-            // Step 1: Split by space to get words
             string[] words = encodedName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
             foreach (string word in words) {
                 string decodedWord = "";
                 string[] encodedChars = word.Split('|', StringSplitOptions.RemoveEmptyEntries);
-
                 foreach(string encodedChar in encodedChars) {
                     if(encodedChar.Length < 2) {
                         Console.WriteLine($"Invalid encoded character: {encodedChar}");
                         continue;
                     }
-
                     char letter = encodedChar[0];
                     string levelStr = encodedChar.Substring(1);
-
                     if(!char.IsLetter(letter) || !int.TryParse(levelStr, out int level)) {
                         Console.WriteLine($"Invalid encoded character format: {encodedChar}");
                         continue;
@@ -223,19 +228,16 @@ namespace Space_Expedition {
                     char decodedChar = DecodeChar(letter, level);
                     decodedWord += decodedChar;
                 }
-
                if(!string.IsNullOrEmpty(decodedWord)) {
                     decodedName += decodedWord + " ";
                 }
             }
             return decodedName.Trim();
         }
-
         public static void InsertionSort(Artifact[] artifacts, int count) {
             for (int i = 1; i < count; i++) {
                 Artifact tempValue = artifacts[i];
                 int j = i - 1;
-
                 while (j >= 0 && String.Compare(artifacts[j].DecodedName.ToLower(), tempValue.DecodedName.ToLower()) > 0) {
                     artifacts[j + 1] = artifacts[j];
                     j--;
@@ -243,8 +245,11 @@ namespace Space_Expedition {
                 artifacts[j + 1] = tempValue;
             }
         }
-
         public static void SaveToFile(Artifact[] artifacts, int count) {
+            if (count == 0) {
+                Console.WriteLine("No artifacts to save. Inventory is empty.");
+                return;
+            }
             try {
                 using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
                     for (int i = 0; i < count; i++) {
