@@ -4,7 +4,9 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            int count;
+            Artifact[] artifacts = Artifacts_Manager.ReadFile(out count);
+            Artifacts_Manager.StartApp(artifacts, ref count);
         }
     }
 }
